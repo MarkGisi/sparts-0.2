@@ -1,0 +1,156 @@
+<div class="blockchain-dashport">
+
+    <div class="blockchain-dash-title">Supply Chain Network Status</div>
+
+    <div class="blockchain-dash-left">
+        <div class="blockchain-dash-info">
+            <strong>Ledger Uptime:</strong> {{uptime}}
+        </div>
+
+        <div class="blockchain-dash-info">
+            <strong>Ledger API Address:</strong>
+            <span class="ledger-api-address">{{ledger_api_address}}</span>
+        </div>
+
+
+        <div class="blockchain-dash-info">
+            <strong>Hyperledger Platform:</strong> Sawtooth 0.8.7
+        </div>
+    </div>
+
+    <div class="blockchain-dash-right">
+        <div class="blockchain-dash-info">
+            <strong>Nodes:</strong> {{nodes|length}} nodes registered on the network
+        </div>
+
+
+        <div class="blockchain-dash-info">
+            <strong>Components:</strong> {{envelope_count}} envelopes, {{part_count}} parts, and
+            {{supplier_count}} suppliers
+        </div>
+    </div>
+
+</div>
+
+<h3>Blockchain Nodes</h3>
+<hr>
+
+
+<div class="blockchain-view-section blockchain-view-section-nodes">
+{% for node in nodes %}
+
+    <div class="blockchain-node">
+
+        <div class="blockchain-node-image">
+        </div>
+
+        <div class="blockchain-node-name">
+            <span>{{node["label"]}}</span>
+        </div>
+
+        <div class="blockchain-node-status" uuid="{{node['uuid']}}">
+        <div class="node-status-text">Status: </div>
+        <div class="blockchain-nodes-preload"></div>
+        <span class="node-status-value">Retrieving...</span>
+        </div>
+
+        <div class="blockchain-node-popup-content">
+            <div><strong>Node {{node["short_id"]}} ({{node["label"]}})</strong></div>
+            <div><strong>Ledger service URL</strong>: {{node["api_url"]}}</div>
+            <div><strong>UUID</strong>: {{node["uuid"]}}</div>
+            <div><strong>Description</strong>: {{node["description"]}}</div>
+        </div>
+
+    </div>
+
+{% endfor %}
+</div>
+
+<h3>Applications</h3>
+<hr>
+
+<div class="blockchain-view-section blockchain-view-section-applications">
+    {% for app in apps %}
+
+        <div class="blockchain-app">
+            <div class="blockchain-app-icon"></div>
+
+            <div class="blockchain-app-name">
+            {{app}}
+            </div>
+        </div>
+
+    {% endfor %}
+</div>
+
+
+
+<h3>Suppliers &amp; Parts</h3>
+<div class="blockchain-queried-ledger">Queried from the ledger</div>
+<hr>
+
+
+<!--
+{% for supplier_id, parts in supplier_parts.items() %}
+<div class="expand-collapse">
+
+    <div class="expand-collapse-title">
+        <div class="expand-collapse-icon">
+            <span class="glyphicon glyphicon-plus"></span>
+        </div>
+
+
+        <div class="expand-collapse-text noselect">
+            {{suppliers[supplier_id].name}}
+        </div>
+    </div>
+
+    <div class="expand-collapse-content">
+    {% for part in parts %}
+
+        <table><tbody><tr><td>
+
+            <div class="mini-part-icon">
+            {% if part.category.name == "operating-systems" %}
+                <div class="part-icon part-icon-os"></div>
+            {% elif part.category.name == "drivers" %}
+                <div class="part-icon part-icon-driver"></div>
+            {% elif part.category.name == "containers" %}
+                <div class="part-icon part-icon-container"></div>
+            {% elif part.category.name == "libraries" %}
+                <div class="part-icon part-icon-library"></div>
+            {% elif part.category.name == "other" %}
+                <div class="part-icon part-icon-file"></div>
+            {% endif %}
+            </div>
+
+        </td><td>
+
+            <div class="blockchain-part-name"><a
+            href="/part/view/{{part.id}}">{{part.name}} {{part.version}}</a></div>
+
+        </td><td>
+
+        {% if part.envelope %}
+            {% if part.envelope.blockchain %}
+
+                <div class="blockchain-envelope-icon"></div>
+
+                </td><td>
+
+                <div class="blockchain-envelope"><a
+                href="/envelope/view/{{part.envelope.uuid}}">{{part.envelope.short_id}}</a></div>
+
+            {% endif %}
+        {% endif %}
+
+        </td></tr></tbody></table>
+
+
+    {% endfor %}
+    </div>
+
+</div>
+
+{% endfor %}
+ -->
