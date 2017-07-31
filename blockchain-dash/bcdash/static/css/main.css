@@ -279,11 +279,12 @@ h3 {
 
 .expand-collapse-content {
     display: none;
+    padding-left: 20px;
     /*margin-left: 15px;*/
 }
 
 .expand-collapse-content table td {
-    padding: 10px;
+    padding: 5px;
 }
 
 .blockchain-part-name {
@@ -295,10 +296,6 @@ h3 {
     /*margin-left: 10px;*/
 }
 
-.mini-part-icon .part-icon {
-    height: 30px;
-    width: 30px;
-}
 
 .noselect {
     -webkit-touch-callout: none;
@@ -387,4 +384,46 @@ h3 {
     box-shadow: inset 0 8px 6px -6px #4e69bc;
     position: absolute;
     z-index: 1;
+}
+
+.blockchain-part-details-popup {
+    display: none;
+}
+
+
+.part-icon {
+    background-size: contain;
+}
+
+.part-icon-os {
+    background-image: url("/static/images/os.png");
+}
+
+.part-icon-driver {
+    background-image: url("/static/images/driver.png");
+}
+
+.part-icon-container {
+    background-image: url("/static/images/container.png");
+}
+
+.part-icon-library {
+    background-image: url("/static/images/library.png");
+}
+
+.part-icon-other {
+    background-image: url("/static/images/file.png");
+}
+
+.part-icon-unknown {
+    background-image: url("/static/images/question.png");
+}
+
+.part-icon-multiple {
+    background-image: url("/static/images/box.png");
+}
+
+.mini-part-icon .part-icon {
+    height: 30px;
+    width: 30px;
 }

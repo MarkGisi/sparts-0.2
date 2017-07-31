@@ -13,6 +13,7 @@ OR CONDITIONS OF ANY KIND, either express or implied.
 """
 import traceback
 import datetime
+import json
 from flask import render_template, Response, jsonify
 from requests.exceptions import ReadTimeout, ConnectionError
 from bcdash import app
@@ -46,7 +47,6 @@ def home():
     supplier_parts = {}
 
     # dict supplier.id -> supplier instance
-    suppliers = {}
 
     apps = ["Sparts", "BC Dash"]
 
@@ -54,33 +54,137 @@ def home():
 
         ledger_ip, ledger_port = get_ledger_api_address()
 
-        # for supplier in db_session.query(Supplier).filter(Supplier.blockchain == True).all():
-        #     suppliers[supplier.id] = supplier
+        categories = [
+            {
+                "uuid": "b7c0cca2-421d-4bd1-7bb8-da4b33aaebd6",
+                "name": "operating-systems",
+                "description" : "Operating Systems"
+            },
+            {
+                "uuid": "4d445cd5-b15e-43a5-7cea-fbb627835b77",
+                "name": "containers",
+                "description" : "Containers"
+            },
+            {
+                "uuid": "940991a2-3f64-417b-7618-8cb810482196",
+                "name": "libraries",
+                "description" : "Libraries"
+            },
+            {
+                "uuid": "92edccef-0b07-4e87-6928-216483bce4c6",
+                "name": "drivers",
+                "description" : "Drivers & Firmware"
+            }
+        ]
 
-        # for part in db_session.query(Part).filter(Part.blockchain == True).all():
-        #     if part.supplier_id not in suppliers:
-        #         continue
+        suppliers = [
+            {
+                "uuid": "1e105fe8-1e1d-408a-4de1-c76e301ba993",
+                "short_id": "",
+                "name": "wind river",
+                "password": "123",
+                "url": "wrs.com"
+            },
+            {
+                "uuid": "46bfba18-270a-431e-68fc-2b5385c15e77",
+                "short_id": "",
+                "name": "intel",
+                "password": "123",
+                "url": "intel.com"
+            }
+        ]
 
-        #     if part.supplier.id not in supplier_parts:
-        #         supplier_parts[part.supplier.id] = []
-        #     supplier_parts[part.supplier.id].append(part)
+        parts = [
+            {
+                "uuid": "a3ee96e8-2eb9-4c9d-40a4-2c996388c386",
+                "name": "Test Part",
+                "checksum": "123",
+                "version": "1.2",
+                "src_uri": "",
+                "url": "",
+                "licensing": "MIT",
+                "label": "test",
+                "description": "123",
+                "categories": ["4d445cd5-b15e-43a5-7cea-fbb627835b77", "940991a2-3f64-417b-7618-8cb810482196"],
+                "suppliers": ["1e105fe8-1e1d-408a-4de1-c76e301ba993"],
+                "envelope_uuid": ""
+            },
+            {
+                "uuid": "6b73bf6e-4dd7-4d7f-50d0-154c0c09d0e9",
+                "name": "Another part",
+                "checksum": "123",
+                "version": "1.54",
+                "src_uri": "",
+                "url": "",
+                "licensing": "GPL",
+                "label": "test",
+                "description": "15341251",
+                "categories": ["92edccef-0b07-4e87-6928-216483bce4c6"],
+                "suppliers": ["46bfba18-270a-431e-68fc-2b5385c15e77"],
+                "envelope_uuid": ""
+            }
+        ]
+
+        envelopes = []
+
+        supplier_parts = {}
+
+        categories_by_uuid = {}
+        for category in categories:
+            categories_by_uuid[category["uuid"]] = category
+
+        for supplier in suppliers:
+            supplier_parts[supplier["uuid"]] = {"supplier": supplier, "parts": []}
+
+        for part in parts:
+
+            category_uuids = part.pop("categories")
+            part["categories"] = []
+
+            #
+            # handle invalid category UUID
+
+            for category_uuid in category_uuids:
+                if category_uuid in categories_by_uuid:
+                    part["categories"].append(categories_by_uuid[category_uuid])
+
+
+            part["envelope"] = []
+            #
+            # attach envelope
+            #
+
+            found_supplier = False
+            for supplier_uuid in part["suppliers"]:
+                if supplier_uuid in supplier_parts:
+                    found_supplier = True
+                    supplier_parts[supplier_uuid]["parts"].append(part)
+
+            if not found_supplier:
+                if not "unknown" in supplier_parts:
+                    supplier_parts["unknown"] = {"supplier": \
+                        {"name": "Unknown supplier. UUID was not found on the blockchain."}, \
+                        "parts": []}
+
+                supplier_parts["unknown"]["parts"].append(part)
+
+
 
 
         return render_page("home", uptime=uptime_sample, \
             suppliers=suppliers, supplier_parts=supplier_parts, apps=apps, \
             nodes=get_blockchain_nodes(), \
-            ledger_api_address="http://" + ledger_ip + ":" + str(ledger_port) + "/api/bcdash", \
-            part_count=sum([len(supplier_parts[supplier_id]) for supplier_id in supplier_parts]), \
-            supplier_count=len(suppliers.items()), \
-            envelope_count=sum([sum([1 for part in supplier_parts[supplier_id] if part.envelope]) \
-            for supplier_id in supplier_parts]))
+            ledger_api_address="http://" + ledger_ip + ":" + str(ledger_port) + "/api/sparts", \
+            envelope_count=len(envelopes), \
+            supplier_count=len(suppliers), \
+            part_count=len(parts))
 
     except ConnectionError:
         return render_page("error", error_message="The conductor service refused connection." \
             + " Could not query blockchain status at this time. Please try again later.")
 
     except APIError as error:
-        return render_page("error", error_message="Failed to call the conductor API service: " \
+        return render_page("error", error_message="Failed to call the conductor API service. " \
             + str(error))
 
 

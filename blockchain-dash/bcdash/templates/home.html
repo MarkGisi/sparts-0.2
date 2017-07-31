@@ -90,8 +90,11 @@
 <hr>
 
 
-<!--
-{% for supplier_id, parts in supplier_parts.items() %}
+
+{% for supplier_uuid in supplier_parts %}
+{% set supplier = supplier_parts[supplier_uuid]["supplier"] %}
+{% set parts = supplier_parts[supplier_uuid]["parts"] %}
+
 <div class="expand-collapse">
 
     <div class="expand-collapse-title">
@@ -101,7 +104,7 @@
 
 
         <div class="expand-collapse-text noselect">
-            {{suppliers[supplier_id].name}}
+            {{supplier["name"]}}
         </div>
     </div>
 
@@ -109,39 +112,73 @@
     {% for part in parts %}
 
         <table><tbody><tr><td>
-
             <div class="mini-part-icon">
-            {% if part.category.name == "operating-systems" %}
-                <div class="part-icon part-icon-os"></div>
-            {% elif part.category.name == "drivers" %}
-                <div class="part-icon part-icon-driver"></div>
-            {% elif part.category.name == "containers" %}
-                <div class="part-icon part-icon-container"></div>
-            {% elif part.category.name == "libraries" %}
-                <div class="part-icon part-icon-library"></div>
-            {% elif part.category.name == "other" %}
-                <div class="part-icon part-icon-file"></div>
-            {% endif %}
+
+                {% if part["categories"]|length == 0%}
+
+                    <div class="part-icon part-icon-unknown"></div>
+
+                {% elif part["categories"]|length == 1 %}
+
+                    {% if part["categories"][0]["name"] == "operating-systems" %}
+
+                        <div class="part-icon part-icon-os"></div>
+
+                    {% elif part["categories"][0]["name"] == "drivers" %}
+
+                        <div class="part-icon part-icon-driver"></div>
+
+                    {% elif part["categories"][0]["name"] == "containers" %}
+
+                        <div class="part-icon part-icon-container"></div>
+
+                    {% elif part["categories"][0]["name"] == "libraries" %}
+
+                        <div class="part-icon part-icon-library"></div>
+
+                    {% else %}
+
+                        <div class="part-icon part-icon-other"></div>
+
+                    {% endif %}
+
+                {% else %}
+
+                    <div class="part-icon part-icon-multiple"></div>
+
+                {% endif %}
+
             </div>
 
         </td><td>
 
-            <div class="blockchain-part-name"><a
-            href="/part/view/{{part.id}}">{{part.name}} {{part.version}}</a></div>
+            <a class="part-name-link" href="javascript:void(0)" ><div class="blockchain-part-name">
+            {{part["name"]}} {{part["version"]}}</div></a>
 
+            <div class="blockchain-part-details-popup">
+                <div><strong>{{part["name"]}} {{part["version"]}}</strong></div>
+                <div><strong>Categories</strong>:
+                {% for category in part["categories"]%}{{category["description"]}}
+                {%- if not loop.last -%}<span>, </span>{%- endif -%}{% endfor %}</div>
+                <div><strong>Label</strong>: {{part["label"]}}</div>
+                <div><strong>Licensing</strong>: {{part["licensing"]}}</div>
+                <div><strong>UUID</strong>: {{part["uuid"]}}</div>
+                <div><strong>Description</strong>: {{part["description"]}}</div>
+                <div><strong>URL</strong>: {{part["url"]}}</div>
+                <div><strong>Source URI</strong>: {{part["src_uri"]}}</div>
+                <div><strong>Checksum</strong>: {{part["checksum"]}}</div>
+            </div>
         </td><td>
 
-        {% if part.envelope %}
-            {% if part.envelope.blockchain %}
+        {% if part["envelope"] %}
 
-                <div class="blockchain-envelope-icon"></div>
+            <div class="blockchain-envelope-icon"></div>
 
-                </td><td>
+            </td><td>
 
-                <div class="blockchain-envelope"><a
-                href="/envelope/view/{{part.envelope.uuid}}">{{part.envelope.short_id}}</a></div>
+            <div class="blockchain-envelope"><a
+            href="/envelope/view/{{part.envelope.uuid}}">{{part.envelope.short_id}}</a></div>
 
-            {% endif %}
         {% endif %}
 
         </td></tr></tbody></table>
@@ -153,4 +190,4 @@
 </div>
 
 {% endfor %}
- -->
+

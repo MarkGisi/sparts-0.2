@@ -64,5 +64,10 @@ $(document).ready(function() {
         popup_message("Node Details", $(this).find(".blockchain-node-popup-content").html());
     });
 
+    $(document).on("click", ".part-name-link", function(evt) {
+        popup_message("Part Details",
+            $(this).parent().find(".blockchain-part-details-popup").html());
+    });
+
 
 });
