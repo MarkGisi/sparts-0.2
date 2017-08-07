@@ -1,0 +1,80 @@
+{% if envelope %}
+
+    <div class="envelope-root">
+
+        <a href="/envelope/view/{{envelope.uuid}}" target="_blank">
+            <img class="envelope-image" src="/static/images/envelope.png">
+        </a>
+
+        <div class="envelope-identity">
+            <div>
+                <strong><a href="/envelope/view/{{envelope.uuid}}" target=
+                "_blank">{{envelope.short_id}}</a></strong>
+            </div>
+
+
+            <div>
+                {{envelope.uuid}}
+            </div>
+        </div>
+
+        {% if envelope.openchain %}
+
+            <div class="envelope-identity envelope-stamp openchain-image"
+            title="Openchain Conformant"></div>
+
+        {% endif %}
+
+        {% if envelope.blockchain == True %}
+
+            <div class="envelope-identity envelope-stamp blockchain-trust-image"
+            title="Trusted by Blockchain"></div>
+
+        {% endif %}
+
+        <div class="envelope-buttons" style="float: right;">
+
+            <button class="btn btn-danger delete-envelope-btn">Delete Envelope</button>
+
+            {% if envelope.boms %}
+
+                <a class="btn btn-info" href="/envelope/bom/view/{{envelope.uuid}}"
+                target="_blank" type="button">Open-source Bill of Materials</a>
+
+            {% endif %}
+
+            <a class="btn btn-success download-envelope-btn"
+            href="/envelope/download/{{envelope.uuid}}/{{envelope.filename}}"
+            target="_blank"><span class="glyphicon glyphicon-download-alt"></span> Download Envelope</a>
+
+        </div>
+    </div>
+
+    <input type="hidden" id="envelope-uuid" value="{{envelope.uuid}}">
+
+{% else %}
+
+    <form action="/envelope/upload" enctype="multipart/form-data" id="envelope-form" method=
+    "post" name="envelope-form">
+        <label class="btn btn-default">Upload Envelope<input accept=".zip" id="env-file" name=
+        "envelope" style="display: none" type="file"></label>
+    </form>
+
+
+    <div class="progress" id="upload-progress-bar">
+        <div aria-valuemax="100" aria-valuemin="0" aria-valuenow="0" class=
+        "progress-bar progress-bar-striped active" role="progressbar" style="width:0%">
+            0%
+        </div>
+    </div>
+
+
+    <div class="progress" id="parse-progress-bar">
+        <div aria-valuemax="100" aria-valuemin="0" aria-valuenow="100" class=
+        "progress-bar progress-bar-success progress-bar-striped active" role="progressbar"
+        style="width:100%">
+            Extracting and parsing envelope ...
+        </div>
+    </div>
+
+{% endif %}

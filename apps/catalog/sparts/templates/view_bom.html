@@ -1,0 +1,441 @@
+<!--
+Copyright (c) 2017 Wind River Systems, Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at:
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software  distributed
+under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+OR CONDITIONS OF ANY KIND, either express or implied.
+-->
+<!DOCTYPE html>
+<html>
+<head>
+
+<style type="text/css">{{ get_resource_as_string("static/css/bootstrap.min.css") | safe }}</style>
+
+<style>
+
+body, html {
+    width: 100%;
+    height: 100%;
+}
+
+a:hover, a:active, a:focus {
+    text-decoration: none;
+}
+
+@font-face {
+  font-family: 'Glyphicons Halflings';
+  src: url('http://getbootstrap.com/dist/fonts/glyphicons-halflings-regular.woff2');
+  src: url('http://getbootstrap.com/dist/fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url('http://getbootstrap.com/dist/fonts/glyphicons-halflings-regular.woff') format('woff'), url('http://getbootstrap.com/dist/fonts/glyphicons-halflings-regular.ttf') format('truetype'), url('http://getbootstrap.com/dist/fonts/glyphicons-halflings-regular.svg#glyphicons-halflingsregular') format('svg');
+}
+
+#page-container {
+    padding: 10px;
+}
+
+.viewer-heading {
+    height: 92px;
+
+    /*border: 1px solid red;*/
+    width: 100%;
+}
+
+.logo-border {
+    background-image: linear-gradient(to right, #cd2027 0%, white 100%);
+    height: 5px;
+}
+
+.windriver-logo {
+}
+
+.page-title {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    width: 100%;
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.bom-entry-path {
+    margin-top: 10px;
+}
+
+.bom-head {
+    height: 60px;
+}
+
+.bom-image {
+    float: left;
+    background-image: url("{{images_folder}}/bom.png");
+    cursor: default;
+    height: 60px;
+    width: 60px;
+    background-size: contain;
+}
+
+.bom-head-text {
+    float: left;
+    padding-top: 12px;
+    padding-left: 5px;
+    font-size: 18px;
+    /*font-weight: bold;*/
+}
+
+
+.bom-entry-path-text {
+    color: #337ab7;
+    padding-top: 20px;
+    padding-left: 60px;
+    cursor: pointer;
+}
+
+.bom-entry-path-text:hover {
+    color: #173753;
+}
+
+.subdir-indent {
+    padding-left: 30px;
+    /*border-left: 10px solid #DDE2F0;*/
+}
+
+.bom-entry-table {
+    border-collapse: collapse;
+}
+
+.bom-entry-table td {
+    padding: 10px;
+    border: 1px solid #EEE;
+}
+
+.bom-entry-table thead td {
+    background-color: #f5f5f5;
+    font-weight: bold;
+}
+
+
+.expand-collapse {
+    margin-left: 20px;
+}
+
+.expand-collapse-title {
+    cursor: pointer;
+    color: #425dae;
+    font-size: 20px;
+    margin-bottom: 20px;
+    margin-top: 20px;
+    user-select: none;
+}
+
+.expand-collapse-text {
+}
+
+.expand-collapse-icon {
+    border: 1px solid #425dae;
+    border-radius: 5px;
+    height: 25px;
+    width: 25px;
+    text-align: center;
+    vertical-align: middle;
+    padding-top: 2px;
+    padding-left: 1px;
+    float: left;
+    margin-right: 10px;
+    font-size: 14px;
+    margin-top: 2px;
+}
+
+.bom-contents {
+    margin-left: 10px;
+}
+
+
+.bom-group-contents {
+    margin-bottom: 30px;
+}
+
+.bom-head-subtext {
+    font-size: 12px;
+}
+
+.details-content {
+    display: none;
+}
+
+.bom-head-details-btn {
+    margin-left: 20px;
+}
+
+#page-container {
+    position: relative;
+    min-height: -moz-calc(100% - 202px);
+    min-height: -webkit-calc(100% - 202px);
+    min-height: -o-calc(100% - 202px);
+    min-height: calc(100% - 202px);
+}
+
+
+#footer{
+    position: relative;
+    background-color: #444;
+    width: 100%;
+    height: 50px;
+    /*bottom: 0;*/
+    padding: 15px;
+    color: #999;
+    padding-left: 30px;
+    clear: both;
+    margin: 0;
+}
+
+.footer-link {
+    color: #999;
+}
+
+.footer-link:hover, .footer-link:focus {
+    color: white;
+}
+
+
+#copyright {
+    float: right;
+}
+
+#attributions {
+    display: none;
+}
+
+.invalid-uuid {
+    color: red;
+}
+
+</style>
+
+<script>{{ get_resource_as_string("static/js/jquery-3.1.1.min.js") | safe }}</script>
+<script>{{ get_resource_as_string("static/js/bootstrap.min.js") | safe }}</script>
+
+<script>
+
+function popup_message(title, message) {
+    $("#popup-dialog .modal-title").html(title);
+    $("#popup-dialog .modal-body").html(message);
+    $("#popup-dialog").modal();
+}
+
+function attributions() {
+    popup_message("Attributions", $("#attributions").html());
+}
+
+$(document).ready(function() {
+
+
+    $(".bom-entry-path").on("click", function() {
+
+        $(this).parent().find(".bom-group-contents").first().toggle();
+        var plusminus = $(this).parent().find(".expand-collapse-icon span").first();
+
+        if (plusminus.hasClass("glyphicon-plus")) {
+            plusminus.removeClass("glyphicon-plus").addClass("glyphicon-minus");
+        }
+        else {
+            plusminus.removeClass("glyphicon-minus").addClass("glyphicon-plus");
+        }
+    });
+
+    $(".details-btn").on("click", function() {
+        popup_message("Details", $(this).parent().find(".details-content").first().html())
+    })
+
+});
+
+
+</script>
+
+<title>
+Wind River Compliance Envelope {{envelope.short_id}} Bill of Materials
+</title>
+
+</head>
+<body>
+
+
+<div class="viewer-heading">
+<div class="windriver-logo"><img src="{{images_folder}}/windriver.png"></div>
+</div>
+<div class="logo-border"></div>
+
+<div class="page-title">
+Open Source Software Bill of Materials
+</div>
+
+<div id="page-container">
+
+
+{%- for bom, bom_graph in bom_graphs %}
+<div class="bom-group">
+
+    <div class="bom-head">
+        <div class="bom-image"></div>
+        <div class="bom-head-text">
+            <div>{{bom.label}}</div>
+            <div class="bom-head-subtext">{{bom.description}}</div>
+        </div>
+        <div class="bom-head-text bom-head-details-btn">
+            <button class="details-btn btn btn-default">Details</button><div class="details-content">
+                    <div><strong>UUID:</strong> {{bom.uuid}}</div>
+                    <div><strong>Part UUID:</strong> {{bom.part_uuid}}</div>
+                    <div><strong>Supplier: </strong> {{bom.supplier}}</div>
+                    <div><strong>Version: </strong> {{bom.version}}</div>
+            </div>
+        </div>
+    </div>
+
+    {%- for node in bom_graph recursive %}
+
+    <div class="bom-group bom-contents">
+
+        {%- if node["dirname"] != "" %}
+
+        <div class="bom-entry-path">
+            <div class="expand-collapse-title">
+                <div class="expand-collapse-icon">
+                <span class="glyphicon glyphicon-plus"></span>
+                </div>
+                <div class="expand-collapse-text noselect">{{node["dirname"]}}</div>
+            </div>
+        </div>
+        {%- endif %}
+
+        <div class="bom-group-contents subdir-indent"
+            style="{{'display: none;' if node["dirname"] != "" }}">
+
+
+            {%- if node["subdir"] %}
+                {{ loop(node["subdir"]) }}
+            {%- endif %}
+
+            <table class="bom-entry-table">
+            <thead>
+                <tr>
+                <td>Name</td>
+                <td>Version</td>
+                <td>Top-level License</td>
+                <td>SPDX</td>
+                <td>Crypto</td>
+                <td></td>
+                </tr>
+            </thead>
+            <tbody>
+            {%- for bomitem, spdx_artifact, crypto_artifact in node["content"] %}
+                <tr>
+                <td>{{bomitem.name}}</td>
+                <td>{{bomitem.version}}</td>
+                <td>{{bomitem.top_license}}</td>
+                {% if spdx_artifact %}
+                    {% if spdx_artifact == "Invalid" %}
+                        <td class="invalid-uuid">Invalid UUID</td>
+                    {% else %}
+                        {% if static_content_links: %}
+                            <td><a target="_blank" href="../_contents{{spdx_artifact.path}}/{{spdx_artifact.filename}}">SPDX Artifact</a></td>
+                        {% else %}
+                            <td><a target="_blank" href="/artifact/{{spdx_artifact.uuid}}/{{spdx_artifact.filename}}">SPDX Artifact</a></td>
+                        {% endif %}
+                    {% endif %}
+                {% else %}
+                    <td>None</td>
+                {% endif %}
+                {% if crypto_artifact %}
+                    {% if spdx_artifact == "Invalid" %}
+                        <td class="invalid-uuid">Invalid UUID</td>
+                    {% else %}
+                        {% if static_content_links: %}
+                            <td><a target="_blank" href="../_contents{{crypto_artifact.path}}/{{crypto_artifact.filename}}">Crypto Report</a></td>
+                        {% else %}
+                            <td><a target="_blank" href="/artifact/{{crypto_artifact.uuid}}/{{crypto_artifact.filename}}">Crypto Report</a></td>
+                        {% endif %}
+                    {% endif %}
+
+                {% else %}
+                    <td>None</td>
+                {% endif %}
+                <td><button class="details-btn btn btn-default">Details</button><div class="details-content">
+                    <div><strong>Checksum:</strong> {{bomitem.checksum}}</div>
+                    <div><strong>Filename:</strong> {{bomitem.filename}}</div>
+                    <div><strong>Source URL:</strong> {{bomitem.src_uri}}</div>
+                </div></td>
+                </tr>
+            {%- endfor %}
+            </tbody>
+            </table>
+
+        </div>
+    </div>
+
+
+{%- endfor %}
+
+</div>
+{%- endfor %}
+
+</div>
+
+<div id="popup-dialog" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Header</h4>
+      </div>
+      <div class="modal-body">
+        <p>Body</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<div id="attributions">
+<div>
+    Envelope icon: Icon made by <a href="http://www.flaticon.com/packs/dialogue-assets-4">Dialogue
+    assets</a> from www.flaticon.com
+</div>
+<div>
+    Folder and server icons: Icon made by <a href=
+    "http://www.flaticon.com/authors/madebyoliver">Madebyoliver</a> from www.flaticon.com
+</div>
+<div>
+    Notice icon: Icon made by <a href="http://www.flaticon.com/authors/freepik">Freepik</a> from
+    www.flaticon.com
+</div>
+<div>
+    File icon: Icon made by <a href="http://www.flaticon.com/authors/madebyoliver">Madebyoliver</a>
+    from www.flaticon.com
+</div>
+<div>
+    BOM icon: Icon made by <a href="http://www.flaticon.com/authors/freepik">Freepik</a>
+    from www.flaticon.com
+</div>
+</div>
+
+<div id="footer">
+    <a class="footer-link" href="http://open.windriver.com:5000"
+    target="_blank">Software Parts Catalog</a>
+    &nbsp;&nbsp;|&nbsp;&nbsp;
+    <a class="footer-link" href="https://www.hyperledger.org/projects/sawtooth"
+    target="_blank">Hyperledger Sawtooth</a>
+    &nbsp;&nbsp;|&nbsp;&nbsp;
+    <a class="footer-link" href="javascript:attributions();">Attributions</a>
+    <div id="copyright">&copy; 2017 Wind River</div>
+</div>
+
+</body>
+</html>

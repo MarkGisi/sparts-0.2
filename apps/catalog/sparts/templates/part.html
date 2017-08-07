@@ -1,0 +1,210 @@
+<script>
+var category_list = JSON.parse('{{category_list|tojson}}');
+var selected_categories = JSON.parse('{{selected_categories|tojson}}');
+var lastsaved_categories = selected_categories.slice();
+</script>
+<div id="part-profile">
+
+    <div id="supplier-name">
+        <a href="/catalog/supplier/{{supplier.id}}">{{supplier.name}}</a>
+
+        <div id="supplier-edit-buttons">
+            <button class="btn btn-default" id="enable-edit-btn" role="button">Edit Part</button>
+            <button class="btn btn-primary" id="save-edit-btn" role="button">Save Edits</button>
+            <button class="btn btn-default" id="cancel-edit-btn" role="button">Cancel</button>
+        </div>
+    </div>
+
+
+    <div class="part-field" id="part-name">
+        <span class="field-value">{{part.name}}</span><span><a class="edit-button" href=
+        "javascript:void(0);">Edit</a></span>
+    </div>
+
+
+    <div class="part-field" id="part-version">
+        <strong>Version:</strong> <span class="field-value">{{part.version}}</span><span><a class=
+        "edit-button" href="javascript:void(0);">Edit</a></span>
+    </div>
+
+
+    <div class="part-field" id="part-licensing">
+        <strong>Licensing:</strong> <span class="field-value">{{part.licensing}}</span><span>
+        <a class="edit-button" href="javascript:void(0);">Edit</a></span>
+    </div>
+
+
+    <div class="part-field" id="part-usku">
+        <strong>Universal SKU:</strong> <span class=
+        "field-value">{{part.usku}}</span><span><a class="edit-button" href=
+        "javascript:void(0);">Edit</a></span>
+    </div>
+
+
+    <div class="part-field" id="part-supplier-part-id">
+        <strong>Supplier Part ID:</strong> <span class=
+        "field-value">{{part.supplier_part_id}}</span><span><a class="edit-button" href=
+        "javascript:void(0);">Edit</a></span>
+    </div>
+
+
+    <div class="part-field" id="part-status">
+        <strong>Status:</strong> <span class="field-value">{{part.status}}</span><span><a class=
+        "edit-button" href="javascript:void(0);">Edit</a></span>
+    </div>
+
+
+    <div class="part-field" id="part-category">
+        <div><strong >Category:</strong></div>
+        <div id="category-select-container">
+            <div class="category-select">
+                <select id="part-profile-category-select" name="category" multiple>
+                    <option value="">Category</option>
+
+                    {% for category in categories %}
+                    <option value="{{category.id}}">
+                        {{category.description}}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="field-value field-category">
+        {%- for category in part.categories -%}
+            {{category.description}}{%- if loop.index !=
+            part.categories|length -%}<span>, </span>{%- endif -%}
+        {%- endfor -%}
+        </div>
+        <span><a class="edit-button" href= "javascript:void(0);">Edit</a></span>
+    </div>
+
+
+
+    <div class="part-field" id="part-url">
+        <strong>Web page:</strong> {% if part.url %} <a href="{{part.url}}" target=
+        "_blank"><span class="field-value">{{part.url}}</span></a> {% else %} <span class=
+        "field-value"></span> {% endif %} <span><a class="edit-button" href=
+        "javascript:void(0);">Edit</a></span>
+    </div>
+
+
+    <div class="part-field" id="part-description">
+        <strong>Description:</strong> <span><a class="edit-button" href=
+        "javascript:void(0);">Edit</a></span><br>
+
+
+        <div class="field-value field-description" data-pk="1" data-type="textarea">
+        {{part.description}}</div>
+    </div>
+    <input id="supplier-id" type="hidden" value="{{supplier.id}}"> <input id="part-id" type=
+    "hidden" value="{{part.id}}">
+
+    <div class="envelope-info">
+        <h4 class="envelope-heading">Compliance Envelope</h4>
+        <hr>
+
+        <div id="envelope-table">
+            {% include "envelope_table.html" %}
+        </div>
+    </div>
+</div>
+
+
+<hr class="delete-part-hr">
+
+<button class="btn btn-danger" id="delete-part-btn" role="button">Delete this part</button>
+
+<div class="modal fade" id="delete-envelope-dialog" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="delete-envelope-form" name="delete-envelope-form" role="form">
+                <div class="modal-header">
+                    <button class="close" data-dismiss="modal" type="button">&times;</button>
+
+                    <h4 class="modal-title">Delete Envelope</h4>
+                </div>
+
+                <div class="modal-body">
+                    <p>Please enter the supplier password to delete this envelope. <span class=
+                    "delete-warning"><strong>IMPORTANT!</strong> This action cannot be undone. This
+                    envelope along with all its associated compliance artifacts will be
+                    permanantely deleted. Once deleted, they cannot be recovered.</span></p>
+                    <label class="control-label supplier-pwd-label" for="pwd"></label>
+                    <input autofocus="" class="form-control supplier-pwd-input" name="pwd"
+                    placeholder="Password" required="true" type="password">
+                </div>
+
+
+                <div class="modal-footer">
+                    <img class="preload-img" src="/static/images/loading.gif"> <button class=
+                    "btn btn-danger" id="btn-confirm-delete" type="submit">Delete Forever</button>
+                    <button class="btn btn-default" data-dismiss="modal" type=
+                    "button">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="delete-part-dialog" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="delete-part-form" name="delete-part-form" role="form">
+                <div class="modal-header">
+                    <button class="close" data-dismiss="modal" type="button">&times;</button>
+
+                    <h4 class="modal-title">Delete Part</h4>
+                </div>
+
+
+                <div class="modal-body">
+                    <p>Please enter the supplier password to delete this part. <span class=
+                    "delete-warning"><strong>IMPORTANT!</strong> This action cannot be undone. This
+                    part along with all its associated compliance envelope information will be
+                    permanantely deleted. Once deleted, they cannot be recovered.</span></p>
+                    <label class="control-label supplier-pwd-label" for="pwd"></label>
+                    <input autofocus="" class="form-control supplier-pwd-input" name="pwd"
+                    placeholder="Password" required="true" type="password">
+                </div>
+
+
+                <div class="modal-footer">
+                    <img class="preload-img" src="/static/images/loading.gif"> <button class=
+                    "btn btn-danger" id="btn-confirm-delete" type="submit">Delete Forever</button>
+                    <button class="btn btn-default" data-dismiss="modal" type=
+                    "button">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="edit-dialog" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="edit-part-form" name="edit-part-form" role="form">
+                <div class="modal-header">
+                    <button class="close" data-dismiss="modal" type="button">&times;</button>
+
+                    <h4 class="modal-title">Save Edits</h4>
+                </div>
+
+
+                <div class="modal-body">
+                    <p>Please enter the supplier password to save your changes.</p>
+                    <label class="control-label supplier-pwd-label" for="pwd"></label>
+                    <input autofocus="" class="form-control supplier-pwd-input" name="pwd"
+                    placeholder="Password" required="true" type="password">
+                </div>
+
+
+                <div class="modal-footer">
+                    <img class="preload-img" src="/static/images/loading.gif"> <button class=
+                    "btn btn-primary" id="btn-save-all" type="submit">Save</button> <button class=
+                    "btn btn-default" data-dismiss="modal" type="button">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

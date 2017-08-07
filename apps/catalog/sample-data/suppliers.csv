@@ -1,0 +1,7 @@
+uuid,short_id,name,password,url,blockchain
+43a670c8-8f12-4219-722f-55b27f56b932,WR,Wind River,wr-2017,www.windriver.com,true
+00c1f0c4-4563-43e9-4e99-14bbe98b8d0c,Intel,Intel,Intel-2017,www.intel.com,true
+c18a98da-9b66-4a5f-4be2-795dfb5f46cb,Raspi,Raspberry Pi Foundation,raspi-2017,www.raspberrypi.org,true
+dc2ac261-d9fc-435e-47cf-f1ce474d6fed,libcur,Libcurl Project,libcr-2017,https://curl.haxx.se,true
+501388fc-61fd-4255-478a-45431f2c77b1,opssl,OpenSSL Project,opssl-2017,www.openssl.org,true
+eb8e19d3-1632-4b70-4da2-46a8bf164d37,bbox,Busybox Project,bbox-2017,busybox.net,true

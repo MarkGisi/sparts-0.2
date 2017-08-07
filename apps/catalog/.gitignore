@@ -1,0 +1,8 @@
+*.py[cod]
+__pycache__/
+artifact-files/
+upload/
+config.py
+api_status
+apitest.py
+apitestcommand.sh

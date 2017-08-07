@@ -1,0 +1,139 @@
+{% if not parts %} No parts found. {% else %}
+
+<div id="catalog-filters">
+    <div id="catalog-select-supplier">
+        <select>
+            <option value="">Suppliers</option>
+
+            {% for supplier in suppliers %}
+
+                {% if not selected_supplier %}
+
+                    <option value="{{supplier.id}}">{{supplier.name}}</option>
+                {% else %}
+
+                    <option value="{{supplier.id}}"
+                    {{ 'selected="selected"' if supplier.id|int == selected_supplier|int }}>
+                    {{supplier.name}}</option>
+
+                {% endif %}
+
+            {% endfor %}
+        </select>
+    </div>
+</div>
+
+
+<div id="catalog-table">
+    {% for part, supplier in parts %}
+
+    <div class="part">
+        <div class="part-icon-wrapper">
+
+            <a href="/part/view/{{part.id}}">
+
+                {% if part.categories|length == 0 %}
+
+                    <div class="part-icon part-icon-unknown"></div>
+
+                {% elif part.categories|length == 1 %}
+
+                    {% if part.categories[0].name == "operating-systems" %}
+
+                        <div class="part-icon part-icon-os"></div>
+
+                    {% elif part.categories[0].name == "drivers" %}
+
+                        <div class="part-icon part-icon-driver"></div>
+
+                    {% elif part.categories[0].name == "containers" %}
+
+                        <div class="part-icon part-icon-container"></div>
+
+                    {% elif part.categories[0].name == "libraries" %}
+
+                        <div class="part-icon part-icon-library"></div>
+
+                    {% else %}
+
+                        <div class="part-icon part-icon-other"></div>
+
+                    {% endif %}
+
+                {% else %}
+
+                    <div class="part-icon part-icon-multiple"></div>
+
+                {% endif %}
+            </a>
+        </div>
+
+        <div class="part-name">
+            <a class="part-name-link" href="/part/view/{{part.id}}">{{part.name}}
+            {{part.version}}</a>
+
+            {% for category in part.categories %}
+                <span class="category-name">{{category.description}}</span>
+            {% endfor %}
+        </div>
+
+
+        <div class="part-details">
+            <div class="part-left-section">
+                <div>
+                    <strong>Part no.</strong>: {{part.usku}}
+                </div>
+
+
+                <div>
+                    <strong>Supplier</strong>: <a href=
+                    "/catalog/supplier/{{supplier.id}}">{{supplier.name}}</a>
+                </div>
+
+
+                <div>
+                    <strong>Licensing</strong>: {{part.licensing}}
+                </div>
+                <!-- <div><strong>Status: </strong> {{part.status}}</div> -->
+            </div>
+
+
+            <div class="part-right-section">
+                <div>
+                    <strong>Web Page</strong>: {% if not part.url %} None {% else %} <a href=
+                    "{{part.url}}" target="_blank">Link</a> {% endif %}
+                </div>
+
+                <div>
+                    <strong>Open Source BOM</strong>:
+
+                    {% if part.envelope and part.envelope.boms %}
+                        <a href="/envelope/bom/view/{{part.envelope.uuid}}">View</a>
+                    {% else %}
+                        None
+                    {% endif %}
+                </div>
+            </div>
+
+
+            <div class="part-download-section">
+                {% if part.envelope %}
+
+                    <a class="btn btn-success" href=
+                    "/envelope/download/{{part.envelope.uuid}}/{{part.envelope.filename}}" type=
+                    "button"><span class="glyphicon glyphicon-download-alt"></span> Download
+                    Envelope</a>
+
+                {% else %}
+
+                    <button class="btn btn-success" disabled="disabled" type=
+                    "button"><span class="glyphicon glyphicon-download-alt"></span> Download
+                    Envelope</button>
+
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}

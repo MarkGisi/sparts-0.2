@@ -1,0 +1,407 @@
+<!--
+Copyright (c) 2017 Wind River Systems, Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at:
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software  distributed
+under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+OR CONDITIONS OF ANY KIND, either express or implied.
+-->
+<!DOCTYPE html>
+<html>
+<head>
+
+<style type=text/css>{{ get_resource_as_string("static/css/bootstrap.min.css") | safe }}</style>
+
+<style>
+
+body, html {
+    width: 100%;
+    height: 100%;
+}
+
+a:hover, a:active, a:focus {
+    text-decoration: none;
+}
+
+#page-container {
+    padding: 10px;
+}
+
+.envelope-viewer-heading {
+    height: 92px;
+
+    /*border: 1px solid red;*/
+    width: 100%;
+}
+
+.logo-border {
+    background-image: linear-gradient(to right, #cd2027 0%, white 100%);
+    height: 5px;
+}
+
+.windriver-logo {
+}
+
+.page-title {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    width: 100%;
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.artifact-path {
+    height: 60px;
+    margin-top: 10px;
+    margin-left: 7px;
+}
+
+.folder-image {
+    width: 50px;
+    height: 50px;
+    float: left;
+    cursor: pointer;
+    background-size: contain;
+}
+
+.folder-image-open {
+    background-image: url("{{images_folder}}/folder.png");
+}
+
+.folder-image-closed {
+    background-image: url("{{images_folder}}/folder-closed.png");
+}
+
+.envelope-image {
+    background-image: url("{{images_folder}}/envelope.png");
+    cursor: default;
+}
+
+.envelope-path-text {
+    padding-top: 20px;
+    padding-left: 60px;
+}
+
+.artifact-path-text {
+    color: #337ab7;
+    padding-top: 20px;
+    padding-left: 60px;
+    cursor: pointer;
+}
+
+.artifact-path-text:hover {
+    color: #173753;
+}
+
+.subdir-indent {
+    margin-left: 50px;
+}
+
+
+.file-logo {
+    width: 60px;
+    height: 60px;
+    background-size: contain;
+    margin: 10px 0;
+}
+
+.spdx-file {
+    background-image: url("{{images_folder}}/spdx-file-2.png");
+}
+.notice-file {
+    background-image: url("{{images_folder}}/notice-file.png");
+}
+.crypto-file {
+    background-image: url("{{images_folder}}/crypto-file.png");
+}
+.other-file {
+    background-image: url("{{images_folder}}/file.png");
+}
+
+.artifact-lable-col a {
+    color:  #337ab7;
+    text-decoration: none;
+    margin-left: 6px;
+}
+
+.artifact-lable-col a:hover {
+    color:  #173753;
+    text-decoration: none;
+}
+
+.artifact-details {
+    display: none;
+}
+
+.btn-envelope-details {
+    margin-left: 20px;
+}
+
+
+#page-container {
+    position: relative;
+    min-height: -moz-calc(100% - 202px);
+    min-height: -webkit-calc(100% - 202px);
+    min-height: -o-calc(100% - 202px);
+    min-height: calc(100% - 202px);
+}
+
+
+#footer{
+    position: relative;
+    background-color: #444;
+    width: 100%;
+    height: 50px;
+    /*bottom: 0;*/
+    padding: 15px;
+    color: #999;
+    padding-left: 30px;
+    clear: both;
+    margin: 0;
+}
+
+.footer-link {
+    color: #999;
+}
+
+.footer-link:hover, .footer-link:focus {
+    color: white;
+}
+
+
+#copyright {
+    float: right;
+}
+
+#attributions {
+    display: none;
+}
+
+
+</style>
+
+<script>{{ get_resource_as_string("static/js/jquery-3.1.1.min.js") | safe }}</script>
+<script>{{ get_resource_as_string("static/js/bootstrap.min.js") | safe }}</script>
+
+<script>
+
+function popup_message(title, message) {
+    $("#popup-dialog .modal-title").html(title);
+    $("#popup-dialog .modal-body").html(message);
+    $("#popup-dialog").modal();
+}
+
+
+function attributions() {
+    popup_message("Attributions", $("#attributions").html());
+}
+
+$(document).ready(function() {
+
+    $(".artifact-path").on("click", function() {
+
+        var folderimage = $(this).find(".folder-image");
+        if (folderimage.hasClass("envelope-image")) return;
+
+        $(this).parent().find(".artifact-directory-contents").first().toggle();
+
+
+        if (folderimage.hasClass("folder-image-open")) {
+            folderimage.removeClass("folder-image-open").addClass("folder-image-closed");
+        }
+        else {
+            folderimage.removeClass("folder-image-closed").addClass("folder-image-open");
+        }
+    });
+
+    $(".btn-envelope-details").on("click", function() {
+        popup_message("Artifact Details",
+            $(this).parent().find(".artifact-details").first().html());
+    })
+});
+
+</script>
+
+<title>
+Wind River Compliance Envelope Infromation
+</title>
+
+</head>
+<body>
+
+
+<div class="envelope-viewer-heading">
+<div class="windriver-logo"><img src="{{images_folder}}/windriver.png"></div>
+</div>
+<div class="logo-border"></div>
+
+<div class="page-title">
+Wind River&reg; {{envelope.short_id}} Compliance Artifacts
+</div>
+
+<div id="page-container">
+
+
+{%- for node in artifact_graph recursive %}
+
+
+    <div class="artifact-directory">
+
+        <div class="artifact-path">
+            {%- if node["dirname"] == "" %}
+                <div class="folder-image envelope-image"></div>
+                <div class="envelope-path-text">{{envelope.short_id}}</div>
+            {%- else %}
+                <div class="folder-image folder-image-closed"></div>
+                <div class="artifact-path-text">{{node["dirname"]}}</div>
+            {%- endif %}
+        </div>
+
+        <div class="artifact-directory-contents subdir-indent"
+            style="{{'display: none;' if node["dirname"] != "" }}">
+
+
+            <table class="artifact-table">
+            <tbody>
+            {%- for artifact in node["content"] %}
+                <tr>
+
+                <td>
+                {%- if static_content_links %}
+                    {%- if artifact.content_type == "oss_bom" and artifact.filename[-7:] == ".ossbom" %}
+                        <a href="./BOM.html" target="_blank">
+                    {%- else %}
+                        <a href="../_contents{{artifact.path}}/{{artifact.filename}}" target="_blank">
+                    {%- endif %}
+                {%- else %}
+                    {%- if artifact.content_type == "oss_bom" and artifact.filename[-7:] == ".ossbom" %}
+                        <a href="/envelope/bom/view/{{envelope.uuid}}" target="_blank">
+                    {%- else %}
+                        <a href="/artifact/{{artifact.uuid}}/{{artifact.filename}}" target="_blank">
+                    {%- endif %}
+                {%- endif %}
+
+                {% if artifact.content_type == "spdx" %}
+                <div class="file-logo spdx-file"></div>
+                {% elif artifact.content_type == "notices" %}
+                <div class="file-logo notice-file"></div>
+                {% elif artifact.content_type == "crypto" %}
+                <div class="file-logo crypto-file"></div>
+                {% else %}
+                <div class="file-logo other-file"></div>
+                {% endif %}
+                </a>
+                </td>
+
+
+                <td class="artifact-lable-col">
+
+                {%- if static_content_links %}
+                    {%- if artifact.content_type == "oss_bom" and artifact.filename[-7:] == ".ossbom" %}
+                        <a href="./BOM.html" target="_blank">{{artifact.label}}</a>
+                    {%- else %}
+                        <a href="../_contents{{artifact.path}}/{{artifact.filename}}" target="_blank">{{artifact.label}}</a>
+                    {%- endif %}
+                {%- else %}
+                    {%- if artifact.content_type == "oss_bom" and artifact.filename[-7:] == ".ossbom" %}
+                        <a href="/envelope/bom/view/{{envelope.uuid}}" target="_blank">{{artifact.label}}</a>
+                    {%- else %}
+                        <a href="/artifact/{{artifact.uuid}}/{{artifact.filename}}" target="_blank">{{artifact.label}}</a>
+                    {%- endif %}
+                {%- endif %}
+
+                </td>
+
+                <td>
+                <button type="button" class="btn btn-default btn-envelope-details">Details</button>
+                <div class="artifact-details">
+                <div class="artifact-details-heading"><strong>{{artifact.short_id}}</strong></div>
+                <div><strong>UUID:</strong> {{artifact.uuid}}</div>
+                <div><strong>SHA1 Checksum:</strong> {{artifact.checksum}}</div>
+                <div><strong>File Name:</strong> {{artifact.filename}}</div>
+                <div><strong>Content Type:</strong> {{artifact.content_type}}</div>
+                <div><strong>Openchain Compliant:</strong> {{"True" if artifact.openchain else "False"}}</div>
+                </div>
+                </td>
+                </tr>
+            {%- endfor %}
+            </tbody>
+            </table>
+
+
+            {%- if node["subdir"] %}
+                {{ loop(node["subdir"]) }}
+            {%- endif %}
+
+        </div>
+    </div>
+
+{%- endfor %}
+
+</div>
+
+
+<div id="popup-dialog" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Header</h4>
+      </div>
+      <div class="modal-body">
+        <p>Body</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="attributions">
+<div>
+    Envelope icon: Icon made by <a href="http://www.flaticon.com/packs/dialogue-assets-4">Dialogue
+    assets</a> from www.flaticon.com
+</div>
+<div>
+    Folder and server icons: Icon made by <a href=
+    "http://www.flaticon.com/authors/madebyoliver">Madebyoliver</a> from www.flaticon.com
+</div>
+<div>
+    Notice icon: Icon made by <a href="http://www.flaticon.com/authors/freepik">Freepik</a> from
+    www.flaticon.com
+</div>
+<div>
+    File icon: Icon made by <a href="http://www.flaticon.com/authors/madebyoliver">Madebyoliver</a>
+    from www.flaticon.com
+</div>
+<div>
+    BOM icon: Icon made by <a href="http://www.flaticon.com/authors/freepik">Freepik</a>
+    from www.flaticon.com
+</div>
+<div>
+    Lock icon: Icon made by <a href="http://www.flaticon.com/authors/simpleicon">SimpleIcon</a>
+    from www.flaticon.com
+</div>
+</div>
+
+<div id="footer">
+    <a class="footer-link" href="http://open.windriver.com:5000"
+    target="_blank">Software Parts Catalog</a>
+    &nbsp;&nbsp;|&nbsp;&nbsp;
+    <a class="footer-link" href="https://www.hyperledger.org/projects/sawtooth"
+    target="_blank">Hyperledger Sawtooth</a>
+    &nbsp;&nbsp;|&nbsp;&nbsp;
+    <a class="footer-link" href="javascript:attributions();">Attributions</a>
+    <div id="copyright">&copy; 2017 Wind River</div>
+</div>
+
+</body>
+</html>

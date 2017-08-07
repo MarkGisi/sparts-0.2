@@ -1,0 +1,122 @@
+<h4 class="new-part-heading">Add a new software part</h4>
+<hr>
+
+
+<div class="form-container new-part-form">
+    <div id="form-modal">
+    </div>
+
+    <form id="new-part-form" name="new-part-form">
+
+        <div class="form-section">
+            <input class="form-control" name="name" placeholder="Name" required="true" type="text">
+        </div>
+
+        <div class="form-section">
+            <input class="form-control" name="version" placeholder="Version" required="true" type=
+            "text">
+        </div>
+
+        <div class="category-select">
+            <select id="select-category" name="category">
+                <option value="">Category</option>
+
+                {% for category in categories %}
+                <option value="{{category.id}}">
+                    {{category.description}}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+
+        <div class="select-supplier-container">
+            <select id="select-supplier" name="supplier" required="true">
+                <option value="">Supplier</option>
+
+                {% for supplier in suppliers %}
+                <option value="{{supplier.id}}">
+                    {{supplier.name}}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+
+        <div class="new-supplier-container">
+            <a class="btn btn-default" href="/supplier/new" role="button">New Supplier</a>
+        </div>
+
+
+        <div class="form-section">
+            <label class="control-label" for="pwd-input" id="pwd-input-text"></label> <input class=
+            "form-control" id="pwd-input" name="pwd" placeholder="Supplier Password" required=
+            "true" type="password">
+        </div>
+
+
+        <div class="form-section">
+            <input class="form-control" name="licensing" placeholder="Licensing" required="true" type=
+            "text">
+        </div>
+
+        <div class="form-section">
+            <input class="form-control" name="usku" placeholder="Universal SKU" required="true"
+            type="text">
+        </div>
+
+
+        <div class="form-section">
+            <input class="form-control" name="supplier_part_id" placeholder="Supplier Part ID"
+            required="true" type="text">
+        </div>
+
+
+        <div class="form-section">
+            <input class="form-control" name="url" placeholder="URL" type="text">
+        </div>
+
+
+        <div class="form-section">
+            <input class="form-control" name="status" placeholder="Status" type="text">
+        </div>
+
+
+        <div class="form-section">
+            <textarea class="form-control" name="description" placeholder="Description" rows=
+            "6"></textarea>
+        </div>
+
+
+        <div class="form-section chkbox-table">
+            <table style="width: 100%;">
+                <tr>
+                    <td style="width: 40px;">
+                        <div class="material-switch">
+                            <input id="blockchain-chkbox" type="checkbox">
+                            <label class="label-primary" for="blockchain-chkbox"></label>
+                        </div>
+                    </td>
+
+                    <td style="width: 200px;">
+                        <div class="chkbox-label noselect" id="blockchain-chkbox-label">
+                            Add to Blockchain
+                        </div>
+                    </td>
+
+                    <td style="text-align: right"><img class="preload-img" src=
+                    "/static/images/loading.gif">
+                    </td>
+
+                    <td style="text-align: right">
+                        <div>
+                            <input class="btn btn-primary" id="save-supplier-btn" type="submit"
+                            value="Add Part">
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+    </form>
+</div>

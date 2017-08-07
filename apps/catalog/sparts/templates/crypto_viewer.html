@@ -1,0 +1,69 @@
+<script>
+$(document).ready(function() {
+	$("code").each(function(i, block) {
+        hljs.highlightBlock(block);
+    });
+});
+</script>
+
+<table><tbody><tr><td>
+<div class="crypto-icon"></div>
+</td><td>
+<h4>Evidence of cryptography in {{package_name}}</h4>
+<div>Artifact {{artifact.uuid}}</div>
+</td></tr></tbody></table>
+<hr>
+
+{% if filelist %}
+
+{% for sha1 in filelist | sort %}
+
+<div class="crypto-filename" file-sha1="{{sha1}}">
+
+    <div class="crypto-expand-collapse" file-sha1="{{sha1}}">
+        <div style="position: relative">
+        <span class="crypto-down-arrow glyphicon glyphicon-chevron-down"></span>
+        <span class="crypto-right-arrow glyphicon glyphicon-chevron-right"></span>
+        </div>
+    </div>
+
+    <div class="crypto-filename-content">
+	    <div style="font-size: 15px; margin-left: 3px">
+	        {% if filelist[sha1]["file_paths"]: %}
+	            {% for filename in filelist[sha1]["file_paths"]:%}
+	            {% set file_path_basename = "/".join(filename.split("/")[:-1]) + "/" %}
+	            {% set file_path_filename = filename.split("/")[-1] %}
+	            <span>{{file_path_basename}}</span><span class="crypto-filename-highlights">{{file_path_filename}}</span><br>
+	            {% endfor %}
+	        {% endif %}
+	    </div>
+
+	    <div style="font-size: 15px; margin-left: 3px; display: none">SHA1: {{sha1}}</div>
+
+    </div>
+</div>
+
+<div class="crypto-file-hits" id="crypto-file-hits-{{sha1}}" file-sha1="{{sha1}}">
+{% for hit in filelist[sha1]["hits"] %}
+<div class="crypto-hit-wrapper">
+<div hit-id="{{hit["hit_hash"]}}" class="crypto-hit-container"><pre>
+<code>{{hit["line_text_before_3"]}}
+{{hit["line_text_before_2"]}}
+{{hit["line_text_before_1"]}}
+{{hit["line_text"][:hit["line_index_begin"]]}}<span class="crypto-emphasis"
+title="{{hit["evidence_type"]}}">{{hit["matched_text"]}}</span>{{hit["line_text"][hit["line_index_end"]:]}}
+{{hit["line_text_after_1"]}}
+{{hit["line_text_after_2"]}}
+{{hit["line_text_after_3"]}}</code></pre>
+</div>
+</div>
+{% endfor %}
+</div>
+
+{% endfor %}
+
+{% else %}
+
+No evidence was found.
+
+{% endif %}
