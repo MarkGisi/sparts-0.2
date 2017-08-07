@@ -20,17 +20,7 @@ function popup_message(title, message) {
 
 $(document).ready(function() {
 
-    $(".expand-collapse-title").on("click", function() {
 
-        $(this).parent().find(".expand-collapse-content").first().toggle();
-        var plusminus = $(this).parent().find(".expand-collapse-icon span").first();
-
-        if (plusminus.hasClass("glyphicon-plus")) {
-            plusminus.removeClass("glyphicon-plus").addClass("glyphicon-minus");
-        } else {
-            plusminus.removeClass("glyphicon-minus").addClass("glyphicon-plus");
-        }
-    });
 
     $(".blockchain-node-status").each(function() {
 
@@ -49,6 +39,7 @@ $(document).ready(function() {
                     $(element).find(".node-status-value")
                         .html(status).addClass("node-status-"
                         + ((status == "Running") ? "running" : "down"));
+
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
                     $(element).find(".blockchain-nodes-preload").hide();
@@ -59,15 +50,46 @@ $(document).ready(function() {
         })($(this).attr("uuid"), $(this));
     });
 
+    $.ajax({
+        url: "/ledger/components",
+        type: "GET",
+        dataType: "html",
 
-    $(document).on("click", ".blockchain-node", function(evt) {
-        popup_message("Node Details", $(this).find(".blockchain-node-popup-content").html());
+        beforeSend: function() {
+        },
+        success: function(response) {
+            $("#blockchain-components").html(response);
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            popup_message("Error", errorThrown);
+        }
     });
 
-    $(document).on("click", ".part-name-link", function(evt) {
-        popup_message("Part Details",
-            $(this).parent().find(".blockchain-part-details-popup").html());
-    });
+
+});
 
 
+$(document).on("click", ".blockchain-node", function(evt) {
+    popup_message("Node Details", $(this).find(".blockchain-node-popup-content").html());
+});
+
+$(document).on("click", ".bc-envelope-link", function(evt) {
+    popup_message("Envelope Details",
+        $(this).parent().find(".bc-envelope-details-popup").html());
+});
+
+$(document).on("click", ".part-name-link", function(evt) {
+    popup_message("Part Details",
+        $(this).parent().find(".blockchain-part-details-popup").html());
+});
+
+$(document).on("click", ".expand-collapse-title", function() {
+    $(this).parent().find(".expand-collapse-content").first().toggle();
+    var plusminus = $(this).parent().find(".expand-collapse-icon span").first();
+
+    if (plusminus.hasClass("glyphicon-plus")) {
+        plusminus.removeClass("glyphicon-plus").addClass("glyphicon-minus");
+    } else {
+        plusminus.removeClass("glyphicon-minus").addClass("glyphicon-plus");
+    }
 });

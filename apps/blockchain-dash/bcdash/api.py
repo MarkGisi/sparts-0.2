@@ -27,23 +27,6 @@ def ping_handler():
     """
     return jsonify({"status": "success"})
 
-def get_uuid():
-    """call the conductor service to a unique UUID
-    """
-    response = requests.get(API_SERVER + "/uuid", timeout=app.config["DEFAULT_API_TIMEOUT"])
-
-    if response.status_code != 200:
-        raise APIError("Failed to call the blockchain API to get a UUID. Conductor server " \
-            + "responded with status " + response.status_code)
-
-    try:
-        data = response.json()
-    except:
-        raise APIError("Failed to parse the JSON in the call to the conductor service " \
-            + "to retrieve a new UUID.")
-
-    return data["uuid"]
-
 def ping_node(node_api_url, timeout=app.config["DEFAULT_API_TIMEOUT"]):
     """ping a blockchain node and return its status
     """
@@ -123,10 +106,10 @@ def register_app_with_blockchain():
     """call the  conductor service to register this app (bcdash catalog) on the supply chain network
     """
     data = {
-        "uuid": "9fb84fa0-1716-4367-7012-61370e23028f",
-        "api_url": "http://open.windriver.com:5000",
+        "uuid": "520e7ee6-26f6-4cd0-6710-49c3579086f4",
+        "api_url": "",
         "type": "website",
-        "label": "Sparts Catalog"
+        "label": "Blockchain Dashboard"
     }
 
     if app.config["BYPASS_API_CALLS"]:
@@ -152,3 +135,81 @@ def register_app_with_blockchain():
     if result["status"] != "success":
         raise APIError("Failed to register app with blockchain. Server returned status '" \
             + str(result["status"]) + "'.")
+
+
+def get_bc_suppliers():
+    return call_blockchain_api("get", "/ledger/suppliers")
+
+def get_bc_parts():
+    return call_blockchain_api("get", "/ledger/parts")
+
+def get_bc_envelopes():
+    return call_blockchain_api("get", "/ledger/envelopes")
+
+def get_bc_categories():
+    return call_blockchain_api("get", "/ledger/categories")
+
+
+def call_blockchain_api(method, url, data={}):
+    """ call the blockchain ledger service with the given method (post or get), url, and data.
+    """
+    if app.config["BYPASS_API_CALLS"]:
+        return {}
+
+    bc_server_ip, bc_server_port = get_ledger_api_address()
+
+    request_url = "http://" + bc_server_ip + ":" + str(bc_server_port) + "/api/sparts" + url
+
+    print("[" + method + "] " + request_url)
+
+    result = None
+
+    try:
+
+        if method == "get":
+            result = requests.get(request_url, params=data, timeout=app.config["DEFAULT_API_TIMEOUT"])
+
+        elif method == "post":
+            result = requests.post(request_url, data=json.dumps(data), \
+                headers={'Content-type': 'application/json'}, timeout=app.config["DEFAULT_API_TIMEOUT"])
+
+        else:
+            raise APIError("Bad method passed to function 'call_blockchain_api")
+
+    except ReadTimeout:
+        raise APIError("Blockchain ledger service timed out.")
+
+    except ConnectionError:
+        raise APIError("Blockchain ledger service refused connection.")
+
+
+    if result.status_code != 200:
+        raise APIError("The blockchain API server responeded with HTTP " + \
+            str(result.status_code) + ".")
+
+    json_result = None
+    try:
+        json_result = result.json()
+    except:
+        raise APIError("Failed to parse the following JSON data in the response of the blockchain" \
+            +" API server.<br><br><pre>" + str(result.content) + "</pre>")
+
+    if "status" in json_result:
+        # raise APIError("Invalid JSON in the response of the ledger service at " + url \
+        #     + "Missing required field 'status'")
+
+        if json_result["status"] == "failed":
+            if "error_message" in json_result:
+                raise APIError("Leger service call to '" + url + "' failed. " \
+                    + "The API server provided the following reason: '" \
+                    + json_result["error_message"] + "'.")
+
+            else:
+                raise APIError("Leger service call to '" + url + "' failed." + \
+                    "No error_message was provided by the server.")
+
+        if json_result["status"] != "success":
+            raise APIError("Leger service call to '" + url + "' returned 'status' = '" \
+                + json_result["status"] + "'.")
+
+    return json_result
