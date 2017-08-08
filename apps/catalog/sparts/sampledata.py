@@ -152,14 +152,17 @@ def reset_handler():
             if part.uuid in part_category_instances:
                 for category in part_category_instances[part.uuid]:
                     part.categories.append(category)
-                    save_part_category_relation(part, category)
-
-            if part.blockchain:
-                part.save_to_blockchain()
 
             db_session.add(part)
 
-            save_part_supplier_relation(part, part.supplier)
+            if part.blockchain:
+
+                part.save_to_blockchain()
+
+                for category in part.categories:
+                    save_part_category_relation(part, category)
+
+                save_part_supplier_relation(part, part.supplier)
 
         db_session.flush()
 
@@ -187,10 +190,9 @@ def reset_handler():
             part.envelope = envelope
             envelope.blockchain = part.blockchain
 
-            save_part_envelope_relation(part, envelope)
-
             if envelope.blockchain:
                 envelope.save_to_blockchain()
+                save_part_envelope_relation(part, envelope)
 
             db_session.flush()
 
