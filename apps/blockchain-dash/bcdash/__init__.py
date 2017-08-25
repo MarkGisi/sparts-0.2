@@ -18,6 +18,7 @@ import sys
 import os
 
 from flask import Flask, jsonify
+from requests.exceptions import ReadTimeout, ConnectionError
 # from werkzeug.contrib.cache import SimpleCache
 
 app = Flask(__name__)
@@ -34,5 +35,10 @@ from bcdash.api import register_app_with_blockchain
 
 try:
     register_app_with_blockchain()
+except ReadTimeout:
+    print("Failed to register app with blockchain. Conductor service timed out")
+except ConnectionError:
+    print("Failed to register app with blockchain. " \
+        + "The conductor service refused connection or is not running.")
 except Exception as error:
     print(str(error))

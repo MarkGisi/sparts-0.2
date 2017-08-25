@@ -99,7 +99,12 @@ def query_ledger_components():
 
                 supplier_parts["unknown"]["parts"].append(part)
 
-        return render_template("components.html", suppliers=suppliers, supplier_parts=supplier_parts)
+        return render_template("components.html", suppliers=suppliers,
+            supplier_parts=supplier_parts,
+            parts_count=len(parts),
+            suppliers_count=len(suppliers),
+            envelopes_count=len([envelope for envelope in envelopes \
+                if envelope["content_type"] == "this"]))
 
     except ConnectionError:
         return render_page("error", error_message="The conductor service refused connection." \

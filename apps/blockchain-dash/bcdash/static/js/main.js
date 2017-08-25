@@ -59,6 +59,9 @@ $(document).ready(function() {
         },
         success: function(response) {
             $("#blockchain-components").html(response);
+            $("#envelope-count").html($("#envelopes-count-value").val());
+            $("#part-count").html($("#parts-count-value").val());
+            $("#supplier-count").html($("#suppliers-count-value").val());
         },
         error: function(jqXHR, textStatus, errorThrown) {
             popup_message("Error", errorThrown);

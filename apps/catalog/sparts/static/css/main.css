@@ -21,12 +21,6 @@ html, body {
     width: 100%;
 }
 
-@font-face {
-    font-family: 'Glyphicons Halflings';
-    src: url('http://getbootstrap.com/dist/fonts/glyphicons-halflings-regular.woff2');
-    src: url('http://getbootstrap.com/dist/fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url('http://getbootstrap.com/dist/fonts/glyphicons-halflings-regular.woff') format('woff'), url('http://getbootstrap.com/dist/fonts/glyphicons-halflings-regular.ttf') format('truetype'), url('http://getbootstrap.com/dist/fonts/glyphicons-halflings-regular.svg#glyphicons-halflingsregular') format('svg');
-}
-
 .btn:focus, .btn:active, .active, .focus, .btn-lg:focus, .btn-lg:active {
     outline: none !important;
 }
@@ -515,7 +509,7 @@ a:hover, a:active, a:focus {
 
 .blockchain-trust-image {
     width: 40px;
-    background-image: url("/static/images/blockchain-trust.png");
+    background-image: url("/static/images/blockchain-logo.png");
 }
 
 .openchain-image {

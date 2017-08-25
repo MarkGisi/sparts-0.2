@@ -33,7 +33,13 @@ def ping_handler():
 def get_uuid():
     """call the conductor service to a unique UUID
     """
-    response = requests.get(API_SERVER + "/uuid", timeout=app.config["DEFAULT_API_TIMEOUT"])
+    try:
+        response = requests.get(API_SERVER + "/uuid", timeout=app.config["DEFAULT_API_TIMEOUT"])
+    except ReadTimeout:
+        raise APIError("Failed to get new UUID. Conductor service timed out")
+    except ConnectionError:
+        raise APIError("Failed to get new UUID. " \
+            + "The conductor service refused connection or is not running.")
 
     if response.status_code != 200:
         raise APIError("Failed to call the blockchain API to get a UUID. Conductor server " \
@@ -53,7 +59,13 @@ def ping_node(node_api_url, timeout=app.config["DEFAULT_API_TIMEOUT"]):
     if not node_api_url:
         return "Node did not provide a ledger service API URL"
 
-    response = requests.get(node_api_url + "/api/sparts/ping", timeout=timeout)
+    try:
+        response = requests.get(node_api_url + "/api/sparts/ping", timeout=timeout)
+    except ReadTimeout:
+        raise APIError("Failed to ping node. Conductor service timed out")
+    except ConnectionError:
+        raise APIError("Failed to ping node. " \
+            + "The conductor service refused connection or is not running.")
 
     if response.status_code != 200:
         return "Down (HTTP " + str(response.status_code) + ")"
@@ -76,7 +88,13 @@ def ping_node(node_api_url, timeout=app.config["DEFAULT_API_TIMEOUT"]):
 def get_blockchain_nodes():
     """get a list of nodes running the ledger and their status from the conductor API
     """
-    response = requests.get(API_SERVER + "/ledger_nodes", timeout=app.config["DEFAULT_API_TIMEOUT"])
+    try:
+        response = requests.get(API_SERVER + "/ledger_nodes", timeout=app.config["DEFAULT_API_TIMEOUT"])
+    except ReadTimeout:
+        raise APIError("Failed to get blockchain nodes. Conductor service timed out")
+    except ConnectionError:
+        raise APIError("Failed to get blockchain nodes. " \
+            + "The conductor service refused connection or is not running.")
 
     print(API_SERVER + "/ledger/nodes")
 
@@ -103,8 +121,14 @@ def get_ledger_api_address():
     Returns:
         (tuple) ip, port
     """
-    response = requests.get(API_SERVER + "/ledger/address", \
-        timeout=app.config["DEFAULT_API_TIMEOUT"])
+    try:
+        response = requests.get(API_SERVER + "/ledger/address", \
+            timeout=app.config["DEFAULT_API_TIMEOUT"])
+    except ReadTimeout:
+        raise APIError("Failed to get ledger API address. Conductor service timed out")
+    except ConnectionError:
+        raise APIError("Failed to get ledger API address. " \
+            + "The conductor service refused connection or is not running.")
 
     if response.status_code != 200:
         raise APIError("Failed to retrieve the blockchain API server address.")
@@ -136,8 +160,14 @@ def register_app_with_blockchain():
     if app.config["BYPASS_API_CALLS"]:
         return
 
-    response = requests.post(API_SERVER + "/app/register", data=json.dumps(data), \
-        headers={'Content-type': 'application/json'}, timeout=app.config["DEFAULT_API_TIMEOUT"])
+    try:
+        response = requests.post(API_SERVER + "/app/register", data=json.dumps(data), \
+            headers={'Content-type': 'application/json'}, timeout=app.config["DEFAULT_API_TIMEOUT"])
+    except ReadTimeout:
+        raise APIError("Failed to register app with blockchain. Conductor service timed out")
+    except ConnectionError:
+        raise APIError("Failed to register app with blockchain. " \
+            + "The conductor service refused connection or is not running.")
 
     if response.status_code != 200:
         raise APIError("Failed to register app with blockchain. Server responded with " \

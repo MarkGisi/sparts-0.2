@@ -84,7 +84,6 @@
 
             <div class="bc-envelope-details-popup">
                 <div><strong>Label</strong>: {{envelope["label"]}}</div>
-                <div><strong>Content Type</strong>: {{envelope["content_type"]}}</div>
                 <div><strong>UUID</strong>: {{envelope["uuid"]}}</div>
                 <div><strong>Checksum</strong>: {{envelope["checksum"]}}</div>
                 <div><strong>OpenChain Conformant</strong>: {{envelope["openchain"]}}</div>
@@ -105,5 +104,9 @@
     </div>
 
 </div>
+
+<input type="hidden" id="suppliers-count-value" value="{{suppliers_count}}">
+<input type="hidden" id="parts-count-value" value="{{parts_count}}">
+<input type="hidden" id="envelopes-count-value" value="{{envelopes_count}}">
 
 {% endfor %}

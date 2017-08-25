@@ -453,7 +453,7 @@ def download_envelope(uuid, filename):
         os.makedirs(resources_path)
 
         for image in ["folder.png", "folder-closed.png", "file.png", "notice-file.png", \
-            "spdx-file-2.png", "openchain1-1.png", "blockchain-trust.png", "windriver.png", \
+            "spdx-file-2.png", "openchain1-1.png", "blockchain-logo.png", "windriver.png", \
             "envelope.png", "bom.png", "crypto-file.png"]:
 
             shutil.copyfile(os.path.join(images_path, image), os.path.join(resources_path, image))

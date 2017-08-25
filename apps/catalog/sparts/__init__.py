@@ -18,6 +18,7 @@ import sys
 import os
 
 from flask import Flask, jsonify
+from requests.exceptions import ReadTimeout, ConnectionError
 # from werkzeug.contrib.cache import SimpleCache
 
 app = Flask(__name__)
@@ -45,10 +46,16 @@ import sparts.sampledata
 import sparts.api
 from sparts.api import register_app_with_blockchain
 
-# register this app with the conductor service
 
 try:
     register_app_with_blockchain()
+except sparts.exceptions.APIError as error:
+    print("Failed to register app with blockchain. " + str(error))
+except ReadTimeout:
+    print("Failed to register app with blockchain. Conductor service timed out")
+except ConnectionError:
+    print("Failed to register app with blockchain. " \
+        + "The conductor service refused connection or is not running.")
 except Exception as error:
     print(str(error))
 
@@ -56,8 +63,13 @@ try:
     sparts.catalog.populate_categories()
 except sparts.exceptions.APIError as error:
     print("Failed to get part categories from the ledger. " + str(error))
-    # sys.exit(1)
-
+except ReadTimeout:
+    print("Failed to get part categories from the ledger. Conductor service timed out")
+except ConnectionError:
+    print("Failed to get part categories from the ledger. " \
+        + "The conductor service refused connection or is not running.")
+except Exception as error:
+    print(str(error))
 
 @app.teardown_appcontext
 def shutdown_session(exception=None):
