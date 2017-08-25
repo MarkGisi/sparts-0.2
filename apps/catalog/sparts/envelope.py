@@ -436,7 +436,7 @@ def download_envelope(uuid, filename):
     envelope_viewer_template = os.path.join(templates_path, "view_envelope.html")
     bom_viewer_template = os.path.join(templates_path, "view_bom.html")
     images_path = os.path.join(static_path, "images")
-    envelope_html_file = os.path.join(viewer_path, "envelope.html")
+    envelope_html_file = os.path.join(viewer_path, "index.html")
     bom_html_file = os.path.join(viewer_path, "BOM.html")
     envelope_zip_file = os.path.join(envelope.extract_dir, filename)
 
