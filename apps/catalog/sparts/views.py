@@ -20,6 +20,7 @@ from sparts.models import Category
 def render_page(template, title="", *args, **kwargs):
     return render_template("site_template.html", page_title=title, \
         template=template, *args, **kwargs, page=template, \
+        production_server=app.config["PRODUCTION"], \
         categories=db_session.query(Category).order_by(asc(Category.id)).all())
 
 def stacktrace():

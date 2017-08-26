@@ -962,19 +962,16 @@ h3 {
 }
 
 #carousel-software-picture {
-    /*background-image: url("/static/images/software.jpg");*/
     width: 500px;
     height: 500px;
 }
 
 #carousel-blockchain-picture {
-    /*background-image: url("/static/images/bc.png");*/
     width: 610px;
     height: 610px;
 }
 
 #carousel-trust-picture {
-    /*background-image: url("/static/images/trust.jpg");*/
     width: 800px;
     height: 500px;
     margin-left: -50px;
