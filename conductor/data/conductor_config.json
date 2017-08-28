@@ -1,0 +1,9 @@
+{
+    "database_file":            "./data/conductor_data.db",
+    "http_port":                3075,
+    "ledger_api_passwd":        "6172d350-6959-4e3d-7906-6feb99d9030e",
+    "debug_on":                 true,
+    "debug_db_on":              true,
+    "verbose_on":               true,
+    "config_reload_allowed":    true
+}
